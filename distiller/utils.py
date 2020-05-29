@@ -202,7 +202,7 @@ def sparsity_3D(tensor):
     if tensor.dim() != 4:
         return 0
     l1_norms = distiller.norms.filters_lp_norm(tensor, p=1, length_normalized=False)
-    num_nonzero_filters = len(torch.nonzero(l1_norms))
+    num_nonzero_filters = len(torch.nonzero(l1_norms, as_tuple=False))
     num_filters = tensor.size(0)
     return 1 - num_nonzero_filters / num_filters
 
@@ -240,7 +240,7 @@ def sparsity_2D(tensor):
         return 0
 
     num_structs = view_2d.size()[0]
-    nonzero_structs = len(torch.nonzero(view_2d.abs().sum(dim=1)))
+    nonzero_structs = len(torch.nonzero(view_2d.abs().sum(dim=1), as_tuple=False))
     return 1 - nonzero_structs/num_structs
 
 
@@ -259,7 +259,7 @@ def non_zero_channels(tensor):
         raise ValueError("Expecting a 4D tensor")
 
     norms = distiller.norms.channels_lp_norm(tensor, p=1)
-    nonzero_channels = torch.nonzero(norms)
+    nonzero_channels = torch.nonzero(norms, as_tuple=False)
     return nonzero_channels
 
 
@@ -314,7 +314,7 @@ def sparsity_blocks(tensor, block_shape):
 
     # Next, compute the sums of each column (block)
     block_sums = view1.abs().sum(dim=1)
-    nonzero_blocks = len(torch.nonzero(block_sums))
+    nonzero_blocks = len(torch.nonzero(block_sums, as_tuple=False))
     return 1 - nonzero_blocks/num_super_blocks
 
 
@@ -324,7 +324,7 @@ def sparsity_matrix(tensor, dim):
         return 0
 
     num_structs = tensor.size()[dim]
-    nonzero_structs = len(torch.nonzero(tensor.abs().sum(dim=1-dim)))
+    nonzero_structs = len(torch.nonzero(tensor.abs().sum(dim=1-dim), as_tuple=False))
     return 1 - nonzero_structs/num_structs
 
 
