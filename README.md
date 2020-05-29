@@ -3,6 +3,8 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/NervanaSystems/distiller/blob/master/LICENSE)
 [![DOI](https://zenodo.org/badge/130871393.svg)](https://zenodo.org/badge/latestdoi/130871393)
 
+**NOTE** This version is a minimal upgrade to PyTorch 1.5.0 that works for one specific use case. The TensorBoard logger (unused in that case) was disabled to avoid a TensorFlow dependency.
+
 <div align="center">
   <h3>
     <a href="https://github.com/NervanaSystems/distiller/wiki">
