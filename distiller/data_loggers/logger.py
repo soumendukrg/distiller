@@ -29,7 +29,7 @@ import tabulate
 import distiller
 from distiller.utils import density, sparsity, sparsity_2D, size_to_str, to_np, norm_filters
 # TensorBoard logger
-# from .tbbackend import TBBackend
+from .tbbackend import TBBackend
 import csv
 import logging
 from contextlib import ExitStack
