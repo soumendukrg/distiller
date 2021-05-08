@@ -46,8 +46,8 @@ class DataLogger(object):
     This backend can be a file, a web service, or some other means to collect and/or
     display the training
     """
-    def __init__(self):
-        pass
+    def __init__(self, log_1d=False):
+        self.sparsity_dim = [2, 3, 4] if log_1d else [2, 4]
 
     def log_training_progress(self, stats_dict, epoch, completed, total, freq):
         pass
@@ -69,8 +69,8 @@ NullLogger = DataLogger
 
 
 class PythonLogger(DataLogger):
-    def __init__(self, logger):
-        super(PythonLogger, self).__init__()
+    def __init__(self, logger, log_1d=False):
+        super(PythonLogger, self).__init__(log_1d)
         self.pylogger = logger
 
     def log_training_progress(self, stats_dict, epoch, completed, total, freq):
@@ -94,7 +94,8 @@ class PythonLogger(DataLogger):
         self.pylogger.info('\n' + t)
 
     def log_weights_sparsity(self, model, epoch):
-        t, total = distiller.weights_sparsity_tbl_summary(model, return_total_sparsity=True)
+        t, total = distiller.weights_sparsity_tbl_summary(model, return_total_sparsity=True,
+                                                          param_dims=self.sparsity_dim)
         self.pylogger.info("\nParameters:\n" + str(t))
         self.pylogger.info('Total sparsity: {:0.2f}\n'.format(total))
 
@@ -126,10 +127,10 @@ class PythonLogger(DataLogger):
 
 
 class TensorBoardLogger(DataLogger):
-    def __init__(self, logdir):
-        super(TensorBoardLogger, self).__init__()
+    def __init__(self, logdir, log_1d=False, comment=''):
+        super(TensorBoardLogger, self).__init__(log_1d)
         # Set the tensorboard logger
-        self.tblogger = TBBackend(logdir)
+        self.tblogger = TBBackend(logdir, comment=comment)
         print('\n--------------------------------------------------------')
         print('Logging to TensorBoard - remember to execute the server:')
         print('> tensorboard --logdir=\'./logs\'\n')
@@ -160,7 +161,7 @@ class TensorBoardLogger(DataLogger):
         sparse_params_size = 0
 
         for name, param in model.state_dict().items():
-            if param.dim() in [2, 4]:
+            if param.dim() in self.sparsity_dim:
                 _density = density(param)
                 params_size += torch.numel(param)
                 sparse_params_size += param.numel() * _density
@@ -227,8 +228,8 @@ class TensorBoardLogger(DataLogger):
 
 
 class CsvLogger(DataLogger):
-    def __init__(self, fname_prefix='', logdir=''):
-        super(CsvLogger, self).__init__()
+    def __init__(self, log_1d=False, fname_prefix='', logdir=''):
+        super(CsvLogger, self).__init__(log_1d)
         self.logdir = logdir
         self.fname_prefix = fname_prefix
 
@@ -249,7 +250,7 @@ class CsvLogger(DataLogger):
             writer.writerow(['parameter', 'shape', 'volume', 'sparse volume', 'sparsity level'])
 
             for name, param in model.state_dict().items():
-                if param.dim() in [2, 4]:
+                if param.dim() in self.sparsity_dim:
                     _density = density(param)
                     params_size += torch.numel(param)
                     sparse_params_size += param.numel() * _density

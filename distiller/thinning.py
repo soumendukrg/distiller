@@ -264,7 +264,7 @@ def create_thinning_recipe_channels(sgraph, model, zeros_mask_dict):
             if param.dim() == 2:
                 # 2D weights (of Linear layers)
                 col_sums = param.abs().sum(dim=0)
-                nonzero_channels = torch.nonzero(col_sums)
+                nonzero_channels = torch.nonzero(col_sums, as_tuple=False)
                 num_nnz_channels = nonzero_channels.nelement()
             elif param.dim() == 4:
                 # 4D weights (of Convolution layers)
@@ -371,7 +371,7 @@ def create_thinning_recipe_filters(sgraph, model, zeros_mask_dict):
         # Find the number of zero-valued filters in this weights tensor
         filter_view = param.view(param.size(0), -1)
         num_filters = filter_view.size()[0]
-        nonzero_filters = torch.nonzero(filter_view.abs().sum(dim=1))
+        nonzero_filters = torch.nonzero(filter_view.abs().sum(dim=1), as_tuple=False)
         num_nnz_filters = nonzero_filters.nelement()
         if num_nnz_filters == 0:
             raise ValueError("Trying to set zero filters for parameter %s is not allowed" % param_name)
