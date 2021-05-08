@@ -179,8 +179,6 @@ class SummaryGraph(object):
                 self.module_ops_map[module_name].append(new_op['name'])
 
                 # Finally we register the new op in the ops collection
-                msglogger.debug("new sgraph node - Scope name: {} ; Type: {} ; Display name {}".format(
-                    new_op['orig-name'], new_op['type'], new_op['name']))
                 self.ops[new_op['name']] = new_op
 
                 for input_ in node.inputs():
@@ -197,6 +195,8 @@ class SummaryGraph(object):
         self.add_macs_attr()
         self.add_footprint_attr()
         self.add_arithmetic_intensity_attr()
+        del trace
+        del graph
         del model_clone
 
     def __merge_pad_avgpool(self):
@@ -303,7 +303,7 @@ class SummaryGraph(object):
                     # Todo: change the method for calculating MACs
                     msglogger.error("An input to a Convolutional layer is missing shape information "
                                     "(MAC values will be wrong)")
-                    msglogger.error("For details see https://github.com/NervanaSystems/distiller/issues/168")
+                    msglogger.error("For details see https://github.com/IntelLabs/distiller/issues/168")
                     op['attrs']['MACs'] = 0
             elif op['type'] == 'Gemm':
                 conv_out = op['outputs'][0]
@@ -313,7 +313,7 @@ class SummaryGraph(object):
                     n_ofm = self.param_shape(conv_out)[1]
                 except IndexError:
                     msglogger.error("An input to a Convolutional layer is missing shape information.")
-                    msglogger.error("For details see https://github.com/NervanaSystems/distiller/issues/360")
+                    msglogger.error("For details see https://github.com/IntelLabs/distiller/issues/360")
                     n_ifm = n_ofm = 0
 
                 # MACs = #IFM * #OFM
